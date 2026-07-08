@@ -27,8 +27,18 @@ While you work, changes autosave to your browser's local storage. When you open 
 ### End-of-session workflow
 
 1. Click **Export** (top right) to download your JSON backup.
-2. Replace `backups/latest.json` in the repo with that file (optionally keep a dated copy in `backups/YYYY-MM-DD.json`).
-3. Commit and push to `main`.
+2. Save the file into [`backups/`](backups/) (e.g. `2026-07-08.json` or keep the export name).
+3. Run:
+
+```bash
+./scripts/push-backup.sh
+```
+
+The script picks the newest file in `backups/`, copies it to `backups/latest.json`, commits, and pushes to `main`. To push a specific file instead:
+
+```bash
+./scripts/push-backup.sh backups/2026-07-08.json
+```
 
 Next time you open https://oarthurcavalcante.github.io/ops/, your tasks load from the latest backup automatically.
 
