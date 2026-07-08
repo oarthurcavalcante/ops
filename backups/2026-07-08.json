@@ -1,0 +1,491 @@
+{
+  "view": {
+    "type": "micro",
+    "phaseId": "3cbnhnd91t",
+    "filter": "all"
+  },
+  "phases": [
+    {
+      "id": "3cbnhnd91t",
+      "name": "Problem",
+      "color": "#B3543F",
+      "note": "Pick a niche where a specific avatar has a painful, monetizable problem. Validate demand before building anything.",
+      "tasks": [
+        {
+          "id": "zo2pyjs91t",
+          "title": "Shortlist 5–10 candidate niches",
+          "done": false,
+          "due": "2026-07-08",
+          "priority": "P2",
+          "notes": "# Candidate Niches:\n\n1. Migration tools\n2. Workout Planner Creator\n3. Financial/Budget organizer\n4. Research thesis planner - notion template \n5. Pilates at home guide\n6. Set of Skills for Claude - university\n7. Male outfit planner/browser\n8. Tax planner (for australia)\n9. Financial planner for small service business (for brasil)\n10. Skill to create content with claude\n",
+          "subtasks": [
+            {
+              "id": "hm9sm5291t",
+              "title": "Check search + social demand per niche",
+              "done": false
+            },
+            {
+              "id": "sdly1zc91t",
+              "title": "Check what competitors already sell",
+              "done": false
+            },
+            {
+              "id": "ebuhuka91t",
+              "title": "Score each niche: pain × purchasing power × reachability",
+              "done": false
+            }
+          ],
+          "_open": true
+        },
+        {
+          "id": "d3b7kpn91t",
+          "title": "Define the exact avatar for top niche",
+          "done": false,
+          "due": "2026-07-08",
+          "priority": "P3",
+          "notes": "",
+          "subtasks": [
+            {
+              "id": "67td48w91t",
+              "title": "Who are they, what do they do daily",
+              "done": false
+            },
+            {
+              "id": "liuce8z91t",
+              "title": "What outcome do they want in 90 days",
+              "done": false
+            },
+            {
+              "id": "ahudojt91t",
+              "title": "Where do they hang out online",
+              "done": false
+            }
+          ],
+          "_open": false
+        },
+        {
+          "id": "wxy7gva91t",
+          "title": "Write the core problem statement (1 sentence)",
+          "done": false,
+          "due": null,
+          "priority": "P3",
+          "notes": "",
+          "subtasks": [],
+          "_open": false
+        },
+        {
+          "id": "qjqr0a191t",
+          "title": "Validate: 10 conversations / DMs / comments confirming the pain",
+          "done": false,
+          "due": null,
+          "priority": "P3",
+          "notes": "",
+          "subtasks": [],
+          "_open": false
+        },
+        {
+          "id": "vt0oskw91t",
+          "title": "Decide niche #1 — commit",
+          "done": false,
+          "due": null,
+          "priority": "P1",
+          "notes": "",
+          "subtasks": [],
+          "_open": false
+        }
+      ]
+    },
+    {
+      "id": "1b6zgfu91t",
+      "name": "Product Development",
+      "color": "#3E6FA8",
+      "note": "Build the smallest product that fully solves the stated problem: template pack, system, or short course.",
+      "tasks": [
+        {
+          "id": "rpwzcz391t",
+          "title": "Choose product format (templates / course / system doc)",
+          "done": false,
+          "due": null,
+          "priority": "P1",
+          "notes": "",
+          "subtasks": [],
+          "_open": false
+        },
+        {
+          "id": "h7ia3o191t",
+          "title": "Outline the product end-to-end",
+          "done": false,
+          "due": null,
+          "priority": "P3",
+          "notes": "",
+          "subtasks": [
+            {
+              "id": "1qj2qb191t",
+              "title": "Promise → modules → outcome per module",
+              "done": false
+            },
+            {
+              "id": "e5jw8cn91t",
+              "title": "Draft with AI, edit with judgment",
+              "done": false
+            }
+          ],
+          "_open": false
+        },
+        {
+          "id": "t0qrtrs91t",
+          "title": "Build v1 of the product",
+          "done": false,
+          "due": null,
+          "priority": "P3",
+          "notes": "",
+          "subtasks": [],
+          "_open": false
+        },
+        {
+          "id": "ru2pfub91t",
+          "title": "Create the lead magnet (free slice of the product)",
+          "done": false,
+          "due": null,
+          "priority": "P3",
+          "notes": "",
+          "subtasks": [],
+          "_open": false
+        },
+        {
+          "id": "cjwvno391t",
+          "title": "Price it — decide front-end price + order bump",
+          "done": false,
+          "due": null,
+          "priority": "P3",
+          "notes": "",
+          "subtasks": [],
+          "_open": false
+        },
+        {
+          "id": "vsxcnnb91t",
+          "title": "Get 3 beta users through it, collect testimonials",
+          "done": false,
+          "due": null,
+          "priority": "P3",
+          "notes": "",
+          "subtasks": [],
+          "_open": false
+        }
+      ]
+    },
+    {
+      "id": "5hjozf391t",
+      "name": "Product Distribution",
+      "color": "#3E8E6C",
+      "note": "Where the product lives and how buyers find it: sales page, funnel, email list.",
+      "tasks": [
+        {
+          "id": "v54ooko91t",
+          "title": "Write the sales page (hook, pain, proof, offer, CTA)",
+          "done": false,
+          "due": null,
+          "priority": "P1",
+          "notes": "",
+          "subtasks": [],
+          "_open": false
+        },
+        {
+          "id": "146q24d91t",
+          "title": "Set up email capture → welcome sequence",
+          "done": false,
+          "due": null,
+          "priority": "P3",
+          "notes": "",
+          "subtasks": [
+            {
+              "id": "v4kn8ft91t",
+              "title": "Lead magnet delivery email",
+              "done": false
+            },
+            {
+              "id": "5wdgd7991t",
+              "title": "3–5 nurture emails",
+              "done": false
+            },
+            {
+              "id": "du9nqzz91t",
+              "title": "Pitch email with deadline",
+              "done": false
+            }
+          ],
+          "_open": false
+        },
+        {
+          "id": "fwpbw5h91t",
+          "title": "Set up the funnel: content → lead magnet → email → offer",
+          "done": false,
+          "due": null,
+          "priority": "P3",
+          "notes": "",
+          "subtasks": [],
+          "_open": false
+        },
+        {
+          "id": "6573pf791t",
+          "title": "Add proof: testimonials, results, screenshots",
+          "done": false,
+          "due": null,
+          "priority": "P3",
+          "notes": "",
+          "subtasks": [],
+          "_open": false
+        }
+      ]
+    },
+    {
+      "id": "ejmacz791t",
+      "name": "Content Distribution",
+      "color": "#8A63B0",
+      "note": "The faceless content engine. AI generates volume, you filter for quality — post the best 30%.",
+      "tasks": [
+        {
+          "id": "7p57wh391t",
+          "title": "Create the faceless account(s) for niche #1",
+          "done": false,
+          "due": null,
+          "priority": "P1",
+          "notes": "",
+          "subtasks": [],
+          "_open": false
+        },
+        {
+          "id": "5qmlpc191t",
+          "title": "Define voice + 3 proven post structures",
+          "done": false,
+          "due": null,
+          "priority": "P3",
+          "notes": "",
+          "subtasks": [
+            {
+              "id": "c5nce8391t",
+              "title": "Analyze 5 winning posts in the niche",
+              "done": false
+            },
+            {
+              "id": "c9es4pb91t",
+              "title": "Turn patterns into reusable prompts",
+              "done": false
+            }
+          ],
+          "_open": false
+        },
+        {
+          "id": "ht45mzi91t",
+          "title": "Build the weekly content pipeline",
+          "done": false,
+          "due": null,
+          "priority": "P3",
+          "notes": "",
+          "subtasks": [
+            {
+              "id": "oivi0oo91t",
+              "title": "Generate 10 drafts",
+              "done": false
+            },
+            {
+              "id": "7eu5guo91t",
+              "title": "Select best 3",
+              "done": false
+            },
+            {
+              "id": "99p95hm91t",
+              "title": "Edit + schedule",
+              "done": false
+            }
+          ],
+          "_open": false
+        },
+        {
+          "id": "ky5ryvs91t",
+          "title": "Post daily for 30 days — no gaps",
+          "done": false,
+          "due": null,
+          "priority": "P3",
+          "notes": "",
+          "subtasks": [],
+          "_open": false
+        },
+        {
+          "id": "i7wv75x91t",
+          "title": "Weekly review: double down on what got reach",
+          "done": false,
+          "due": null,
+          "priority": "P3",
+          "notes": "",
+          "subtasks": [],
+          "_open": false
+        }
+      ]
+    },
+    {
+      "id": "pfizwa891t",
+      "name": "Ads",
+      "color": "#C2882F",
+      "note": "Paid amplification only after organic proves the message. Small tests, kill fast, scale winners.",
+      "tasks": [
+        {
+          "id": "mmsr3k591t",
+          "title": "Set a test budget + max cost per lead",
+          "done": false,
+          "due": null,
+          "priority": "P3",
+          "notes": "",
+          "subtasks": [],
+          "_open": false
+        },
+        {
+          "id": "qj5470w91t",
+          "title": "Turn 3 best organic posts into ad creatives",
+          "done": false,
+          "due": null,
+          "priority": "P3",
+          "notes": "",
+          "subtasks": [],
+          "_open": false
+        },
+        {
+          "id": "3zblaoj91t",
+          "title": "Launch first test campaign (traffic → lead magnet)",
+          "done": false,
+          "due": null,
+          "priority": "P3",
+          "notes": "",
+          "subtasks": [],
+          "_open": false
+        },
+        {
+          "id": "wqq8pmh91t",
+          "title": "Track CPL / CTR / conversion — kill losers in 72h",
+          "done": false,
+          "due": null,
+          "priority": "P3",
+          "notes": "",
+          "subtasks": [],
+          "_open": false
+        },
+        {
+          "id": "j956fex91t",
+          "title": "Scale the winning creative",
+          "done": false,
+          "due": null,
+          "priority": "P3",
+          "notes": "",
+          "subtasks": [],
+          "_open": false
+        }
+      ]
+    },
+    {
+      "id": "shku1oq91t",
+      "name": "Checkout",
+      "color": "#3A8E99",
+      "note": "The money path: payment, delivery, bumps. Every click of friction costs sales.",
+      "tasks": [
+        {
+          "id": "kb3ujew91t",
+          "title": "Set up payment processor + checkout page",
+          "done": false,
+          "due": null,
+          "priority": "P1",
+          "notes": "",
+          "subtasks": [],
+          "_open": false
+        },
+        {
+          "id": "ky101o791t",
+          "title": "Add order bump / upsell",
+          "done": false,
+          "due": null,
+          "priority": "P3",
+          "notes": "",
+          "subtasks": [],
+          "_open": false
+        },
+        {
+          "id": "4pdqesm91t",
+          "title": "Automate product delivery on purchase",
+          "done": false,
+          "due": null,
+          "priority": "P3",
+          "notes": "",
+          "subtasks": [],
+          "_open": false
+        },
+        {
+          "id": "sh30jn691t",
+          "title": "Test the full buying flow yourself on mobile",
+          "done": false,
+          "due": null,
+          "priority": "P3",
+          "notes": "",
+          "subtasks": [],
+          "_open": false
+        },
+        {
+          "id": "q76uneu91t",
+          "title": "Set up abandoned-checkout email",
+          "done": false,
+          "due": null,
+          "priority": "P3",
+          "notes": "",
+          "subtasks": [],
+          "_open": false
+        }
+      ]
+    },
+    {
+      "id": "rekbm5a91t",
+      "name": "Automation",
+      "color": "#6B7280",
+      "note": "Systemize everything repeatable so a page runs on ~2h/week — that’s what makes multiple pages possible.",
+      "tasks": [
+        {
+          "id": "4xgth8h91t",
+          "title": "Document the SOP for one page (content → funnel → sales)",
+          "done": false,
+          "due": null,
+          "priority": "P3",
+          "notes": "",
+          "subtasks": [],
+          "_open": false
+        },
+        {
+          "id": "75efmzt91t",
+          "title": "Automate scheduling + email flows",
+          "done": false,
+          "due": null,
+          "priority": "P3",
+          "notes": "",
+          "subtasks": [],
+          "_open": false
+        },
+        {
+          "id": "jwmkt9091t",
+          "title": "Build a weekly metrics snapshot (revenue, leads, reach)",
+          "done": false,
+          "due": null,
+          "priority": "P3",
+          "notes": "",
+          "subtasks": [],
+          "_open": false
+        },
+        {
+          "id": "t7heo2d91t",
+          "title": "Decide: optimize page #1 vs launch page #2",
+          "done": false,
+          "due": null,
+          "priority": "P3",
+          "notes": "",
+          "subtasks": [],
+          "_open": false
+        }
+      ]
+    }
+  ]
+}

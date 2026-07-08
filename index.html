@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OPS — Business Command Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,400..800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ECEEE9;
+  --panel:#FFFFFF;
+  --panel-2:#F6F7F3;
+  --ink:#20242B;
+  --ink-2:#5C6370;
+  --ink-3:#9AA0A9;
+  --line:#D5D8CF;
+  --line-2:#E4E6DF;
+  --danger:#B3382C;
+  --ok:#3E8E6C;
+  --radius:10px;
+  --mono:'IBM Plex Mono',ui-monospace,monospace;
+  --sans:'Archivo',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:15px;
+  line-height:1.45;
+  -webkit-font-smoothing:antialiased;
+}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,textarea,select{font-family:inherit;font-size:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:4px}
+
+/* ---------- Top bar ---------- */
+.topbar{
+  position:sticky;top:0;z-index:50;
+  background:var(--ink);color:#EDEFEA;
+  padding:0 20px;height:52px;
+  display:flex;align-items:center;gap:18px;
+  font-family:var(--mono);font-size:12px;
+}
+.topbar .brand{font-family:var(--sans);font-weight:800;font-size:15px;letter-spacing:.06em}
+.topbar .brand span{opacity:.5;font-weight:400}
+.ticker{display:flex;gap:18px;flex:1;overflow:hidden;white-space:nowrap}
+.ticker .t{display:flex;gap:6px;align-items:baseline}
+.ticker .t b{font-weight:600;color:#fff}
+.ticker .t.warn b{color:#F0A48F}
+.topbar .actions{display:flex;gap:8px}
+.topbar .actions button{
+  font-family:var(--mono);font-size:11px;letter-spacing:.04em;
+  border:1px solid rgba(255,255,255,.25);border-radius:6px;
+  padding:5px 10px;color:#EDEFEA;
+}
+.topbar .actions button:hover{background:rgba(255,255,255,.12)}
+
+/* ---------- Layout ---------- */
+.wrap{max-width:1200px;margin:0 auto;padding:28px 20px 80px}
+.viewhead{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+.viewhead h1{font-size:26px;font-weight:800;letter-spacing:-.01em;font-stretch:85%}
+.viewhead .sub{font-family:var(--mono);font-size:11.5px;color:var(--ink-2);margin-top:4px}
+.kbd-hint{font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+
+/* ---------- Macro: overall meter ---------- */
+.overall{
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  padding:18px 20px;margin-bottom:26px;
+  display:grid;grid-template-columns:1fr auto auto auto;gap:26px;align-items:center;
+}
+.overall .meter{display:flex;flex-direction:column;gap:8px}
+.meter-track{height:8px;background:var(--line-2);border-radius:99px;overflow:hidden;display:flex}
+.meter-seg{height:100%}
+.overall .stat{font-family:var(--mono);text-align:right}
+.overall .stat .n{font-size:22px;font-weight:600;display:block}
+.overall .stat .l{font-size:10.5px;color:var(--ink-2);letter-spacing:.08em;text-transform:uppercase}
+.overall .stat.warn .n{color:var(--danger)}
+.meter-label{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--ink-2)}
+
+/* ---------- Macro: pipeline ---------- */
+.pipeline{position:relative;display:flex;flex-direction:column;gap:0}
+.pipeline::before{
+  content:'';position:absolute;left:19px;top:14px;bottom:14px;width:2px;
+  background:var(--line);
+}
+.phase-card{
+  position:relative;
+  display:grid;grid-template-columns:40px 1fr;gap:0 14px;
+  padding:10px 0;
+  cursor:grab;
+}
+.phase-card.dragging{opacity:.4}
+.phase-card.drop-above>.card-body{box-shadow:0 -3px 0 0 var(--ink)}
+.phase-card.drop-below>.card-body{box-shadow:0 3px 0 0 var(--ink)}
+.node{
+  position:relative;z-index:1;width:40px;height:40px;border-radius:50%;
+  border:2px solid var(--ph);background:var(--panel);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:12px;font-weight:600;color:var(--ph);
+  align-self:start;margin-top:6px;
+}
+.card-body{
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 18px;transition:border-color .15s, transform .1s;
+}
+.card-body:hover{border-color:var(--ink-3)}
+.card-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.card-top h2{
+  font-size:16px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;
+  font-stretch:80%;cursor:pointer;
+}
+.card-top h2:hover{text-decoration:underline;text-underline-offset:3px}
+.badge{
+  font-family:var(--mono);font-size:10.5px;padding:2px 8px;border-radius:99px;
+  border:1px solid var(--line);color:var(--ink-2);
+}
+.badge.due-warn{border-color:var(--danger);color:var(--danger)}
+.card-top .spacer{flex:1}
+.open-btn{
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  border:1px solid var(--ink);border-radius:6px;padding:5px 12px;
+}
+.open-btn:hover{background:var(--ink);color:#fff}
+.card-meter{margin-top:12px;display:flex;align-items:center;gap:12px}
+.card-meter .meter-track{flex:1;height:6px}
+.card-meter .pct{font-family:var(--mono);font-size:11.5px;color:var(--ink-2);min-width:86px;text-align:right}
+.card-next{
+  margin-top:10px;font-family:var(--mono);font-size:11.5px;color:var(--ink-2);
+  display:flex;gap:8px;flex-wrap:wrap;
+}
+.card-next .chip{
+  background:var(--panel-2);border:1px solid var(--line-2);border-radius:6px;padding:3px 8px;
+  max-width:340px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.card-next .chip.over{border-color:var(--danger);color:var(--danger)}
+.add-phase{
+  margin:14px 0 0 54px;
+  font-family:var(--mono);font-size:12px;color:var(--ink-2);
+  border:1px dashed var(--ink-3);border-radius:var(--radius);
+  padding:12px 16px;width:calc(100% - 54px);text-align:left;
+}
+.add-phase:hover{color:var(--ink);border-color:var(--ink)}
+
+/* ---------- Micro view ---------- */
+.micro-head{
+  border-left:4px solid var(--ph);
+  padding-left:16px;margin-bottom:20px;
+}
+.back{
+  font-family:var(--mono);font-size:11.5px;color:var(--ink-2);
+  display:inline-flex;gap:6px;align-items:center;margin-bottom:14px;
+}
+.back:hover{color:var(--ink)}
+.micro-head .name-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.phase-name-input{
+  font-family:var(--sans);font-size:26px;font-weight:800;letter-spacing:.02em;
+  text-transform:uppercase;font-stretch:80%;
+  border:none;background:transparent;border-bottom:1px dashed transparent;
+  min-width:120px;max-width:520px;
+}
+.phase-name-input:hover,.phase-name-input:focus{border-bottom-color:var(--ink-3);outline:none}
+.del-phase{font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+.del-phase:hover{color:var(--danger)}
+.phase-note{
+  width:100%;margin-top:12px;background:var(--panel-2);
+  border:1px solid var(--line-2);border-radius:8px;padding:10px 12px;
+  font-size:13.5px;resize:vertical;min-height:44px;color:var(--ink-2);
+}
+.phase-note:focus{outline:none;border-color:var(--ink-3);color:var(--ink)}
+
+.toolbar{display:flex;gap:10px;align-items:center;margin:18px 0 14px;flex-wrap:wrap}
+.filters{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--panel)}
+.filters button{
+  font-family:var(--mono);font-size:11.5px;padding:7px 13px;color:var(--ink-2);
+  border-right:1px solid var(--line-2);
+}
+.filters button:last-child{border-right:none}
+.filters button.on{background:var(--ink);color:#fff}
+.toolbar .count{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);margin-left:auto}
+
+.add-task{
+  display:flex;gap:8px;background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--radius);padding:8px;margin-bottom:16px;flex-wrap:wrap;
+}
+.add-task input[type=text]{
+  flex:1;min-width:200px;border:none;background:transparent;padding:8px 10px;font-size:14px;
+}
+.add-task input[type=text]:focus{outline:none}
+.add-task input[type=date]{
+  font-family:var(--mono);font-size:12px;border:1px solid var(--line-2);
+  border-radius:6px;padding:6px 8px;background:var(--panel-2);color:var(--ink-2);
+}
+.add-task .go{
+  background:var(--ink);color:#fff;border-radius:7px;padding:8px 16px;
+  font-weight:600;font-size:13px;
+}
+
+.task{
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  margin-bottom:8px;overflow:hidden;
+}
+.task.dragging{opacity:.4}
+.task.drop-above{box-shadow:0 -3px 0 0 var(--ink)}
+.task.drop-below{box-shadow:0 3px 0 0 var(--ink)}
+.task-row{display:flex;align-items:center;gap:10px;padding:10px 12px}
+.grip{cursor:grab;color:var(--ink-3);font-size:14px;line-height:1;padding:4px 2px;user-select:none}
+.cbx{
+  width:19px;height:19px;flex:none;border:2px solid var(--ink-3);border-radius:5px;
+  display:flex;align-items:center;justify-content:center;background:var(--panel);
+}
+.cbx.done{background:var(--ph);border-color:var(--ph);color:#fff}
+.cbx svg{width:11px;height:11px}
+.task-title{
+  flex:1;border:none;background:transparent;font-size:14px;padding:2px 4px;min-width:80px;
+}
+.task-title:focus{outline:none;background:var(--panel-2);border-radius:4px}
+.task.is-done .task-title{color:var(--ink-3);text-decoration:line-through}
+.task-meta{display:flex;align-items:center;gap:8px;flex:none}
+.due{
+  font-family:var(--mono);font-size:11px;border:1px solid var(--line-2);
+  background:var(--panel-2);border-radius:6px;padding:4px 7px;color:var(--ink-2);
+}
+.due.over{border-color:var(--danger);color:var(--danger);background:#FBEEEC}
+.prio{
+  font-family:var(--mono);font-size:10px;letter-spacing:.06em;border-radius:6px;
+  padding:4px 8px;border:1px solid var(--line);color:var(--ink-2);
+}
+.prio.P1{background:var(--ink);border-color:var(--ink);color:#fff}
+.prio.P2{border-color:var(--ink-2);color:var(--ink)}
+.expand,.tdel{color:var(--ink-3);font-size:13px;padding:4px}
+.expand:hover{color:var(--ink)} .tdel:hover{color:var(--danger)}
+.expand .car{display:inline-block;transition:transform .15s}
+.task.open .expand .car{transform:rotate(90deg)}
+
+.task-detail{
+  display:none;border-top:1px solid var(--line-2);background:var(--panel-2);
+  padding:14px 16px 16px 48px;
+}
+.task.open .task-detail{display:block}
+.task-detail label{
+  display:block;font-family:var(--mono);font-size:10px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-3);margin:12px 0 6px;
+}
+.task-detail label:first-child{margin-top:0}
+.task-notes{
+  width:100%;min-height:60px;border:1px solid var(--line-2);border-radius:8px;
+  padding:9px 11px;font-size:13.5px;resize:vertical;background:var(--panel);
+}
+.task-notes:focus{outline:none;border-color:var(--ink-3)}
+.sub{display:flex;align-items:center;gap:9px;padding:4px 0}
+.sub .cbx{width:16px;height:16px;border-radius:4px}
+.sub input[type=text]{flex:1;border:none;background:transparent;font-size:13.5px;padding:2px 4px}
+.sub input[type=text]:focus{outline:none;background:var(--panel);border-radius:4px}
+.sub.done input[type=text]{color:var(--ink-3);text-decoration:line-through}
+.sub .tdel{font-size:12px}
+.add-sub{display:flex;gap:8px;margin-top:6px}
+.add-sub input{
+  flex:1;border:1px dashed var(--line);border-radius:6px;padding:6px 10px;
+  font-size:13px;background:transparent;
+}
+.add-sub input:focus{outline:none;border-color:var(--ink-2);border-style:solid}
+.detail-controls{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;align-items:center}
+.detail-controls select{
+  font-family:var(--mono);font-size:11.5px;border:1px solid var(--line);border-radius:6px;
+  padding:6px 8px;background:var(--panel);color:var(--ink-2);
+}
+.empty{
+  border:1px dashed var(--line);border-radius:var(--radius);padding:28px;
+  text-align:center;font-family:var(--mono);font-size:12px;color:var(--ink-3);
+}
+.toast{
+  position:fixed;bottom:22px;left:50%;transform:translateX(-50%);
+  background:var(--ink);color:#fff;font-family:var(--mono);font-size:12px;
+  padding:9px 16px;border-radius:8px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:99;
+}
+.toast.show{opacity:1}
+@media (max-width:720px){
+  .overall{grid-template-columns:1fr 1fr;gap:16px}
+  .overall .meter{grid-column:1/-1}
+  .task-detail{padding-left:16px}
+  .topbar .ticker{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">OPS<span> / command center</span></div>
+  <div class="ticker" id="ticker"></div>
+  <div class="actions">
+    <button id="exportBtn" title="Download a JSON backup of everything">Export</button>
+    <button id="importBtn" title="Restore from a JSON backup">Import</button>
+    <input type="file" id="importFile" accept="application/json" hidden>
+  </div>
+</header>
+
+<main class="wrap" id="app"></main>
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   STORAGE — works inside Claude (window.storage) or as a
+   downloaded file (localStorage), with in-memory fallback.
+   ========================================================= */
+const KEY = 'ops_dashboard_v1';
+let memStore = null;
+const store = {
+  async load(){
+    try{
+      if (window.storage){ const r = await window.storage.get(KEY); return r ? JSON.parse(r.value) : null; }
+    }catch(e){ /* key missing or unavailable */ }
+    try{
+      if (typeof localStorage !== 'undefined'){ const v = localStorage.getItem(KEY); return v ? JSON.parse(v) : null; }
+    }catch(e){}
+    return memStore;
+  },
+  async save(data){
+    const s = JSON.stringify(data);
+    memStore = data;
+    try{ if (window.storage){ await window.storage.set(KEY, s); return; } }catch(e){}
+    try{ if (typeof localStorage !== 'undefined'){ localStorage.setItem(KEY, s); } }catch(e){}
+  }
+};
+let saveTimer = null;
+function persist(){ clearTimeout(saveTimer); saveTimer = setTimeout(()=>store.save(state), 350); }
+
+/* =========================================================
+   SEED DATA — faceless info-product business playbook
+   ========================================================= */
+const uid = () => Math.random().toString(36).slice(2,9) + Date.now().toString(36).slice(-3);
+const T = (title, opts={}) => ({ id:uid(), title, done:false, due:null, priority:'P3', notes:'', subtasks:[], ...opts,
+  subtasks:(opts.subtasks||[]).map(s=>({id:uid(),title:s,done:false})) });
+
+function seed(){
+  return { view:{ type:'macro', phaseId:null, filter:'all' }, phases:[
+    { id:uid(), name:'Problem', color:'#B3543F', note:'Pick a niche where a specific avatar has a painful, monetizable problem. Validate demand before building anything.', tasks:[
+      T('Shortlist 5–10 candidate niches', {priority:'P1', subtasks:['Check search + social demand per niche','Check what competitors already sell','Score each niche: pain × purchasing power × reachability']}),
+      T('Define the exact avatar for top niche', {subtasks:['Who are they, what do they do daily','What outcome do they want in 90 days','Where do they hang out online']}),
+      T('Write the core problem statement (1 sentence)'),
+      T('Validate: 10 conversations / DMs / comments confirming the pain'),
+      T('Decide niche #1 — commit', {priority:'P1'}),
+    ]},
+    { id:uid(), name:'Product Development', color:'#3E6FA8', note:'Build the smallest product that fully solves the stated problem: template pack, system, or short course.', tasks:[
+      T('Choose product format (templates / course / system doc)', {priority:'P1'}),
+      T('Outline the product end-to-end', {subtasks:['Promise → modules → outcome per module','Draft with AI, edit with judgment']}),
+      T('Build v1 of the product'),
+      T('Create the lead magnet (free slice of the product)'),
+      T('Price it — decide front-end price + order bump'),
+      T('Get 3 beta users through it, collect testimonials'),
+    ]},
+    { id:uid(), name:'Product Distribution', color:'#3E8E6C', note:'Where the product lives and how buyers find it: sales page, funnel, email list.', tasks:[
+      T('Write the sales page (hook, pain, proof, offer, CTA)', {priority:'P1'}),
+      T('Set up email capture → welcome sequence', {subtasks:['Lead magnet delivery email','3–5 nurture emails','Pitch email with deadline']}),
+      T('Set up the funnel: content → lead magnet → email → offer'),
+      T('Add proof: testimonials, results, screenshots'),
+    ]},
+    { id:uid(), name:'Content Distribution', color:'#8A63B0', note:'The faceless content engine. AI generates volume, you filter for quality — post the best 30%.', tasks:[
+      T('Create the faceless account(s) for niche #1', {priority:'P1'}),
+      T('Define voice + 3 proven post structures', {subtasks:['Analyze 5 winning posts in the niche','Turn patterns into reusable prompts']}),
+      T('Build the weekly content pipeline', {subtasks:['Generate 10 drafts','Select best 3','Edit + schedule']}),
+      T('Post daily for 30 days — no gaps'),
+      T('Weekly review: double down on what got reach'),
+    ]},
+    { id:uid(), name:'Ads', color:'#C2882F', note:'Paid amplification only after organic proves the message. Small tests, kill fast, scale winners.', tasks:[
+      T('Set a test budget + max cost per lead'),
+      T('Turn 3 best organic posts into ad creatives'),
+      T('Launch first test campaign (traffic → lead magnet)'),
+      T('Track CPL / CTR / conversion — kill losers in 72h'),
+      T('Scale the winning creative'),
+    ]},
+    { id:uid(), name:'Checkout', color:'#3A8E99', note:'The money path: payment, delivery, bumps. Every click of friction costs sales.', tasks:[
+      T('Set up payment processor + checkout page', {priority:'P1'}),
+      T('Add order bump / upsell'),
+      T('Automate product delivery on purchase'),
+      T('Test the full buying flow yourself on mobile'),
+      T('Set up abandoned-checkout email'),
+    ]},
+    { id:uid(), name:'Automation', color:'#6B7280', note:'Systemize everything repeatable so a page runs on ~2h/week — that\u2019s what makes multiple pages possible.', tasks:[
+      T('Document the SOP for one page (content → funnel → sales)'),
+      T('Automate scheduling + email flows'),
+      T('Build a weekly metrics snapshot (revenue, leads, reach)'),
+      T('Decide: optimize page #1 vs launch page #2'),
+    ]},
+  ]};
+}
+
+/* =========================================================
+   STATE + HELPERS
+   ========================================================= */
+let state = null;
+const $  = (s,el=document)=>el.querySelector(s);
+const app = document.getElementById('app');
+const todayStr = () => new Date().toISOString().slice(0,10);
+const isOverdue = t => !t.done && t.due && t.due < todayStr();
+const esc = s => (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const phaseById = id => state.phases.find(p=>p.id===id);
+
+function phaseStats(p){
+  let total=0, done=0, over=0, next=null;
+  for(const t of p.tasks){
+    total++; if(t.done) done++;
+    if(isOverdue(t)) over++;
+    if(!t.done && t.due && (!next || t.due < next.due)) next = t;
+    for(const s of t.subtasks){ total++; if(s.done) done++; }
+  }
+  return { total, done, over, next, pct: total? Math.round(done/total*100) : 0, openTasks: p.tasks.filter(t=>!t.done).length };
+}
+function globalStats(){
+  let total=0, done=0, over=0, week=0;
+  const in7 = new Date(Date.now()+7*864e5).toISOString().slice(0,10);
+  for(const p of state.phases) for(const t of p.tasks){
+    total++; if(t.done) done++;
+    if(isOverdue(t)) over++;
+    if(!t.done && t.due && t.due>=todayStr() && t.due<=in7) week++;
+  }
+  return { total, done, over, week, pct: total? Math.round(done/total*100):0 };
+}
+function fmtDue(d){
+  if(!d) return '';
+  const diff = Math.round((new Date(d+'T00:00') - new Date(todayStr()+'T00:00'))/864e5);
+  if(diff===0) return 'today';
+  if(diff===1) return 'tomorrow';
+  if(diff===-1) return '1d late';
+  if(diff<0) return `${-diff}d late`;
+  if(diff<=13) return `in ${diff}d`;
+  return d.slice(5).replace('-','·');
+}
+function toast(msg){
+  const el = $('#toast'); el.textContent = msg; el.classList.add('show');
+  clearTimeout(el._t); el._t = setTimeout(()=>el.classList.remove('show'), 1800);
+}
+
+/* =========================================================
+   RENDER
+   ========================================================= */
+function render(){
+  renderTicker();
+  if(state.view.type==='macro') renderMacro(); else renderMicro();
+  persist();
+}
+
+function renderTicker(){
+  const g = globalStats();
+  $('#ticker').innerHTML = `
+    <div class="t"><span>PROGRESS</span><b>${g.pct}%</b></div>
+    <div class="t"><span>DONE</span><b>${g.done}/${g.total}</b></div>
+    <div class="t ${g.over?'warn':''}"><span>OVERDUE</span><b>${g.over}</b></div>
+    <div class="t"><span>DUE&nbsp;7D</span><b>${g.week}</b></div>
+    <div class="t"><span>PHASES</span><b>${state.phases.length}</b></div>`;
+}
+
+/* ---------- MACRO ---------- */
+function renderMacro(){
+  const g = globalStats();
+  const segs = state.phases.map(p=>{
+    const s = phaseStats(p);
+    const w = g.total ? (s.done/g.total*100) : 0;
+    return `<div class="meter-seg" style="width:${w}%;background:${p.color}" title="${esc(p.name)}: ${s.done} done"></div>`;
+  }).join('');
+
+  app.innerHTML = `
+    <div class="viewhead">
+      <div>
+        <h1>The whole machine</h1>
+        <div class="sub">macro view — click a phase to zoom in · drag cards to reorder the pipeline</div>
+      </div>
+      <div class="kbd-hint">autosaves as you type</div>
+    </div>
+
+    <section class="overall">
+      <div class="meter">
+        <div class="meter-label"><span>OVERALL COMPLETION</span><span>${g.done} of ${g.total} items</span></div>
+        <div class="meter-track">${segs}</div>
+      </div>
+      <div class="stat"><span class="n">${g.pct}%</span><span class="l">complete</span></div>
+      <div class="stat ${g.over?'warn':''}"><span class="n">${g.over}</span><span class="l">overdue</span></div>
+      <div class="stat"><span class="n">${g.week}</span><span class="l">due in 7 days</span></div>
+    </section>
+
+    <div class="pipeline" id="pipeline">
+      ${state.phases.map((p,i)=>macroCard(p,i)).join('')}
+    </div>
+    <button class="add-phase" id="addPhase">+ Add a phase / area</button>
+  `;
+
+  $('#addPhase').onclick = ()=>{
+    const name = prompt('Name the new phase / area:');
+    if(!name) return;
+    const colors = ['#B3543F','#3E6FA8','#3E8E6C','#8A63B0','#C2882F','#3A8E99','#6B7280','#A04E7E'];
+    state.phases.push({ id:uid(), name:name.trim(), color:colors[state.phases.length%colors.length], note:'', tasks:[] });
+    render();
+  };
+
+  document.querySelectorAll('.phase-card').forEach(card=>{
+    const id = card.dataset.id;
+    card.querySelector('.card-body').addEventListener('click', e=>{
+      if(e.target.closest('.no-open')) return;
+      openPhase(id);
+    });
+    // drag to reorder phases
+    card.addEventListener('dragstart', e=>{ e.dataTransfer.setData('phase', id); card.classList.add('dragging'); });
+    card.addEventListener('dragend', ()=>card.classList.remove('dragging'));
+    card.addEventListener('dragover', e=>{
+      if(!e.dataTransfer.types.includes('phase')) return;
+      e.preventDefault();
+      const above = e.offsetY < card.offsetHeight/2;
+      card.classList.toggle('drop-above', above);
+      card.classList.toggle('drop-below', !above);
+    });
+    card.addEventListener('dragleave', ()=>card.classList.remove('drop-above','drop-below'));
+    card.addEventListener('drop', e=>{
+      e.preventDefault();
+      const srcId = e.dataTransfer.getData('phase');
+      card.classList.remove('drop-above','drop-below');
+      if(!srcId || srcId===id) return;
+      const from = state.phases.findIndex(p=>p.id===srcId);
+      const [moved] = state.phases.splice(from,1);
+      let to = state.phases.findIndex(p=>p.id===id);
+      if(e.offsetY >= card.offsetHeight/2) to++;
+      state.phases.splice(to,0,moved);
+      render();
+    });
+  });
+}
+
+function macroCard(p,i){
+  const s = phaseStats(p);
+  const nextChips = p.tasks.filter(t=>!t.done).slice(0,2).map(t=>
+    `<span class="chip ${isOverdue(t)?'over':''}">${t.due? fmtDue(t.due)+' · ':''}${esc(t.title)}</span>`).join('');
+  return `
+  <div class="phase-card" draggable="true" data-id="${p.id}" style="--ph:${p.color}">
+    <div class="node">${String(i+1).padStart(2,'0')}</div>
+    <div class="card-body">
+      <div class="card-top">
+        <h2>${esc(p.name)}</h2>
+        <span class="badge">${s.openTasks} open</span>
+        ${s.over? `<span class="badge due-warn">${s.over} overdue</span>`:''}
+        <span class="spacer"></span>
+        <button class="open-btn">OPEN →</button>
+      </div>
+      <div class="card-meter">
+        <div class="meter-track"><div class="meter-seg" style="width:${s.pct}%;background:${p.color}"></div></div>
+        <span class="pct">${s.done}/${s.total} · ${s.pct}%</span>
+      </div>
+      ${nextChips? `<div class="card-next"><span style="color:var(--ink-3)">NEXT</span>${nextChips}</div>`:''}
+    </div>
+  </div>`;
+}
+
+function openPhase(id){ state.view = { type:'micro', phaseId:id, filter:'all' }; render(); window.scrollTo(0,0); }
+
+/* ---------- MICRO ---------- */
+function renderMicro(){
+  const p = phaseById(state.view.phaseId);
+  if(!p){ state.view={type:'macro'}; return render(); }
+  const s = phaseStats(p);
+  const f = state.view.filter;
+  const visible = p.tasks.filter(t=>{
+    if(f==='open') return !t.done;
+    if(f==='done') return t.done;
+    if(f==='overdue') return isOverdue(t);
+    return true;
+  });
+
+  app.innerHTML = `
+    <button class="back" id="back">← back to the whole machine</button>
+    <div class="micro-head" style="--ph:${p.color}">
+      <div class="name-row">
+        <input class="phase-name-input" id="phaseName" value="${esc(p.name)}" aria-label="Phase name">
+        <span class="badge">${s.done}/${s.total} · ${s.pct}%</span>
+        ${s.over? `<span class="badge due-warn">${s.over} overdue</span>`:''}
+        <span style="flex:1"></span>
+        <button class="del-phase" id="delPhase">delete phase</button>
+      </div>
+      <textarea class="phase-note" id="phaseNote" placeholder="Notes for this whole area — strategy, links, decisions…">${esc(p.note)}</textarea>
+    </div>
+
+    <div class="add-task" style="--ph:${p.color}">
+      <input type="text" id="newTaskTitle" placeholder="Add a task to ${esc(p.name)}… (Enter to add)">
+      <input type="date" id="newTaskDue" title="Due date (optional)">
+      <button class="go" id="addTask">Add</button>
+    </div>
+
+    <div class="toolbar">
+      <div class="filters">
+        ${['all','open','overdue','done'].map(k=>`<button data-f="${k}" class="${f===k?'on':''}">${k.toUpperCase()}</button>`).join('')}
+      </div>
+      <span class="count">${visible.length} shown · drag ⠿ to reorder</span>
+    </div>
+
+    <div id="taskList" style="--ph:${p.color}">
+      ${visible.length? visible.map(t=>taskRow(p,t)).join('')
+        : `<div class="empty">Nothing here. ${f==='all'?'Add the first task above.':'No tasks match this filter.'}</div>`}
+    </div>
+  `;
+
+  $('#back').onclick = ()=>{ state.view={type:'macro'}; render(); };
+  $('#phaseName').onchange = e=>{ p.name = e.target.value.trim()||p.name; render(); };
+  $('#phaseNote').oninput = e=>{ p.note = e.target.value; persist(); };
+  $('#delPhase').onclick = ()=>{
+    if(confirm(`Delete "${p.name}" and its ${p.tasks.length} tasks? This can't be undone.`)){
+      state.phases = state.phases.filter(x=>x.id!==p.id);
+      state.view={type:'macro'}; render(); toast('Phase deleted');
+    }
+  };
+  const addTask = ()=>{
+    const title = $('#newTaskTitle').value.trim(); if(!title) return;
+    p.tasks.unshift(T(title,{due: $('#newTaskDue').value || null}));
+    render(); $('#newTaskTitle')?.focus(); toast('Task added');
+  };
+  $('#addTask').onclick = addTask;
+  $('#newTaskTitle').addEventListener('keydown', e=>{ if(e.key==='Enter') addTask(); });
+  document.querySelectorAll('.filters button').forEach(b=> b.onclick = ()=>{ state.view.filter=b.dataset.f; render(); });
+
+  document.querySelectorAll('.task').forEach(el=> bindTask(el, p));
+}
+
+function taskRow(p,t){
+  const over = isOverdue(t);
+  return `
+  <div class="task ${t.done?'is-done':''} ${t._open?'open':''}" data-id="${t.id}">
+    <div class="task-row">
+      <span class="grip" draggable="true" title="Drag to reorder">⠿</span>
+      <button class="cbx ${t.done?'done':''}" aria-label="Toggle done">
+        ${t.done?'<svg viewBox="0 0 12 12" fill="none"><path d="M2 6.5L4.8 9.2 10 3.5" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>':''}
+      </button>
+      <input class="task-title" value="${esc(t.title)}">
+      <div class="task-meta">
+        ${t.due? `<span class="due ${over?'over':''}" title="${t.due}">${fmtDue(t.due)}</span>`:''}
+        ${t.priority!=='P3'? `<span class="prio ${t.priority}">${t.priority}</span>`:''}
+        ${t.subtasks.length? `<span class="badge">${t.subtasks.filter(s=>s.done).length}/${t.subtasks.length}</span>`:''}
+        <button class="expand" aria-label="Details"><span class="car">›</span></button>
+        <button class="tdel" aria-label="Delete task">✕</button>
+      </div>
+    </div>
+    <div class="task-detail">
+      <label>Notes</label>
+      <textarea class="task-notes" placeholder="Context, links, decisions…">${esc(t.notes)}</textarea>
+      <label>Subtasks</label>
+      <div class="subs">
+        ${t.subtasks.map(s=>`
+          <div class="sub ${s.done?'done':''}" data-sid="${s.id}">
+            <button class="cbx ${s.done?'done':''}">${s.done?'<svg viewBox="0 0 12 12" fill="none"><path d="M2 6.5L4.8 9.2 10 3.5" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>':''}</button>
+            <input type="text" value="${esc(s.title)}">
+            <button class="tdel">✕</button>
+          </div>`).join('')}
+      </div>
+      <div class="add-sub"><input type="text" placeholder="+ subtask (Enter to add)"></div>
+      <div class="detail-controls">
+        <select class="ctl-due-preset" title="Due date">
+          <option value="">Due date…</option>
+          <option value="today">Today</option><option value="tomorrow">Tomorrow</option>
+          <option value="week">In a week</option><option value="pick">Pick a date</option>
+          <option value="clear">Clear</option>
+        </select>
+        <input type="date" class="ctl-due" value="${t.due||''}" style="display:${t.due?'inline-block':'none'};font-family:var(--mono);font-size:11.5px;border:1px solid var(--line);border-radius:6px;padding:5px 7px;background:var(--panel)">
+        <select class="ctl-prio" title="Priority">
+          <option value="P3" ${t.priority==='P3'?'selected':''}>P3 · normal</option>
+          <option value="P2" ${t.priority==='P2'?'selected':''}>P2 · important</option>
+          <option value="P1" ${t.priority==='P1'?'selected':''}>P1 · critical</option>
+        </select>
+        <select class="ctl-move" title="Move to another phase">
+          <option value="">Move to…</option>
+          ${state.phases.filter(x=>x.id!==p.id).map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+  </div>`;
+}
+
+function bindTask(el, p){
+  const t = p.tasks.find(x=>x.id===el.dataset.id); if(!t) return;
+
+  el.querySelector('.task-row .cbx').onclick = ()=>{ t.done=!t.done; render(); };
+  el.querySelector('.task-title').onchange = e=>{ t.title = e.target.value.trim()||t.title; render(); };
+  el.querySelector('.expand').onclick = ()=>{ t._open=!t._open; render(); };
+  el.querySelector('.task-row .tdel').onclick = ()=>{
+    if(confirm(`Delete "${t.title}"?`)){ p.tasks = p.tasks.filter(x=>x!==t); render(); }
+  };
+  el.querySelector('.task-notes').oninput = e=>{ t.notes = e.target.value; persist(); };
+
+  // subtasks
+  el.querySelectorAll('.sub').forEach(row=>{
+    const s = t.subtasks.find(x=>x.id===row.dataset.sid); if(!s) return;
+    row.querySelector('.cbx').onclick = ()=>{ s.done=!s.done; render(); };
+    row.querySelector('input').onchange = e=>{ s.title = e.target.value.trim()||s.title; persist(); };
+    row.querySelector('.tdel').onclick = ()=>{ t.subtasks = t.subtasks.filter(x=>x!==s); render(); };
+  });
+  const subInput = el.querySelector('.add-sub input');
+  subInput.addEventListener('keydown', e=>{
+    if(e.key==='Enter' && subInput.value.trim()){
+      t.subtasks.push({id:uid(), title:subInput.value.trim(), done:false}); render();
+      // reopen + refocus
+      const again = document.querySelector(`.task[data-id="${t.id}"] .add-sub input`); again?.focus();
+    }
+  });
+
+  // due date + priority + move
+  const dueInput = el.querySelector('.ctl-due');
+  el.querySelector('.ctl-due-preset').onchange = e=>{
+    const v = e.target.value; e.target.value='';
+    if(v==='today') t.due = todayStr();
+    else if(v==='tomorrow') t.due = new Date(Date.now()+864e5).toISOString().slice(0,10);
+    else if(v==='week') t.due = new Date(Date.now()+7*864e5).toISOString().slice(0,10);
+    else if(v==='clear') t.due = null;
+    else if(v==='pick'){ dueInput.style.display='inline-block'; dueInput.showPicker?.(); dueInput.focus(); return; }
+    render();
+  };
+  dueInput.onchange = e=>{ t.due = e.target.value || null; render(); };
+  el.querySelector('.ctl-prio').onchange = e=>{ t.priority = e.target.value; render(); };
+  el.querySelector('.ctl-move').onchange = e=>{
+    const dest = phaseById(e.target.value); if(!dest) return;
+    p.tasks = p.tasks.filter(x=>x!==t); dest.tasks.unshift(t);
+    render(); toast(`Moved to ${dest.name}`);
+  };
+
+  // drag & drop reorder
+  const grip = el.querySelector('.grip');
+  grip.addEventListener('dragstart', e=>{
+    e.dataTransfer.setData('task', t.id); el.classList.add('dragging');
+  });
+  grip.addEventListener('dragend', ()=>el.classList.remove('dragging'));
+  el.addEventListener('dragover', e=>{
+    if(!e.dataTransfer.types.includes('task')) return;
+    e.preventDefault();
+    const r = el.getBoundingClientRect();
+    const above = (e.clientY - r.top) < r.height/2;
+    el.classList.toggle('drop-above', above);
+    el.classList.toggle('drop-below', !above);
+  });
+  el.addEventListener('dragleave', ()=>el.classList.remove('drop-above','drop-below'));
+  el.addEventListener('drop', e=>{
+    e.preventDefault(); el.classList.remove('drop-above','drop-below');
+    const srcId = e.dataTransfer.getData('task');
+    if(!srcId || srcId===t.id) return;
+    const from = p.tasks.findIndex(x=>x.id===srcId);
+    if(from<0) return;
+    const [moved] = p.tasks.splice(from,1);
+    const r = el.getBoundingClientRect();
+    let to = p.tasks.findIndex(x=>x.id===t.id);
+    if((e.clientY - r.top) >= r.height/2) to++;
+    p.tasks.splice(to,0,moved);
+    render();
+  });
+}
+
+/* =========================================================
+   EXPORT / IMPORT
+   ========================================================= */
+$('#exportBtn').onclick = ()=>{
+  const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `ops-dashboard-backup-${todayStr()}.json`;
+  a.click(); URL.revokeObjectURL(a.href);
+  toast('Backup downloaded');
+};
+$('#importBtn').onclick = ()=> $('#importFile').click();
+$('#importFile').onchange = e=>{
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = ()=>{
+    try{
+      const data = JSON.parse(r.result);
+      if(!Array.isArray(data.phases)) throw new Error('bad file');
+      state = data; state.view = {type:'macro'};
+      render(); toast('Backup restored');
+    }catch(err){ toast('That file isn\u2019t a valid backup'); }
+  };
+  r.readAsText(f); e.target.value='';
+};
+
+/* =========================================================
+   BOOT
+   ========================================================= */
+(async ()=>{
+  const saved = await store.load();
+  state = saved && Array.isArray(saved.phases) ? saved : seed();
+  if(!state.view) state.view = {type:'macro'};
+  // strip transient flags
+  state.phases.forEach(p=>p.tasks.forEach(t=>{ if(t._open===undefined) t._open=false; }));
+  render();
+})();
+</script>
+</body>
+</html>
