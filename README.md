@@ -22,19 +22,17 @@ Open [`index.html`](index.html) in any browser. No install, no server, no depend
 
 ## Data
 
-Everything autosaves to the browser's local storage on the machine where you open it.
-**Data lives in the browser, not in this file** — committing a new version of the HTML never touches your tasks.
+While you work, changes autosave to your browser's local storage. When you open the live link, the dashboard **automatically fetches `backups/latest.json` from the repo** and syncs to it.
 
-Use **Export** (top right) to download a JSON backup, **Import** to restore it. Committing the exported JSON to this repo is a good habit if you work across devices.
+### End-of-session workflow
 
-### Updating backups in the repo
+1. Click **Export** (top right) to download your JSON backup.
+2. Replace `backups/latest.json` in the repo with that file (optionally keep a dated copy in `backups/YYYY-MM-DD.json`).
+3. Commit and push to `main`.
 
-1. Export from the dashboard (top right).
-2. Save the file as `backups/YYYY-MM-DD.json`.
-3. Copy the same file to `backups/latest.json`.
-4. Commit and push.
+Next time you open https://oarthurcavalcante.github.io/ops/, your tasks load from the latest backup automatically.
 
-The dashboard and latest-backup links above do not change — only the content they serve updates.
+Use **Import** only if you need to restore from a different file manually.
 
 ## Updating the dashboard
 

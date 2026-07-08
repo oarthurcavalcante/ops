@@ -328,6 +328,25 @@ const store = {
 let saveTimer = null;
 function persist(){ clearTimeout(saveTimer); saveTimer = setTimeout(()=>store.save(state), 350); }
 
+const REMOTE_BACKUP = './backups/latest.json';
+const canFetchRemote = location.protocol !== 'file:';
+
+function isValidBackup(data){
+  return data && Array.isArray(data.phases) && data.phases.length > 0;
+}
+
+async function loadRemoteBackup(){
+  if(!canFetchRemote) return null;
+  try{
+    const res = await fetch(`${REMOTE_BACKUP}?t=${Date.now()}`, { cache: 'no-store' });
+    if(!res.ok) return null;
+    const data = await res.json();
+    return isValidBackup(data) ? data : null;
+  }catch(e){
+    return null;
+  }
+}
+
 /* =========================================================
    SEED DATA — faceless info-product business playbook
    ========================================================= */
@@ -766,7 +785,7 @@ $('#importFile').onchange = e=>{
   r.onload = ()=>{
     try{
       const data = JSON.parse(r.result);
-      if(!Array.isArray(data.phases)) throw new Error('bad file');
+      if(!isValidBackup(data)) throw new Error('bad file');
       state = data; state.view = {type:'macro'};
       render(); toast('Backup restored');
     }catch(err){ toast('That file isn\u2019t a valid backup'); }
@@ -778,12 +797,21 @@ $('#importFile').onchange = e=>{
    BOOT
    ========================================================= */
 (async ()=>{
-  const saved = await store.load();
-  state = saved && Array.isArray(saved.phases) ? saved : seed();
+  let source = 'seed';
+  const remote = await loadRemoteBackup();
+  if(remote){
+    state = remote;
+    source = 'remote';
+  }else{
+    const saved = await store.load();
+    state = isValidBackup(saved) ? saved : seed();
+    source = isValidBackup(saved) ? 'local' : 'seed';
+  }
   if(!state.view) state.view = {type:'macro'};
-  // strip transient flags
   state.phases.forEach(p=>p.tasks.forEach(t=>{ if(t._open===undefined) t._open=false; }));
+  await store.save(state);
   render();
+  if(source === 'remote') toast('Synced from latest backup');
 })();
 </script>
 </body>
